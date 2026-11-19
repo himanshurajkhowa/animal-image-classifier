@@ -24,7 +24,8 @@ export default function (component) {
   const gallery = data.gallery ?? [];
   const maxPhotoBytes = 8 * 1024 * 1024;
   const maxPreparedBytes = 700 * 1024;
-  const maxPhotoPixels = 24_000_000;
+  const serverPhotoPixels = 24_000_000;
+  const maxDecodePixels = 64_000_000;
   const heicHint =
     "This browser could not open the HEIC photo. Export it as JPEG or upload a screenshot.";
 
@@ -54,7 +55,13 @@ export default function (component) {
   }
 
   async function preparePhoto(file, image, format, signal) {
-    if (file.size <= maxPreparedBytes && format !== "heic") return file;
+    const { naturalWidth: width, naturalHeight: height } = image;
+    if (
+      file.size <= maxPreparedBytes &&
+      width * height <= serverPhotoPixels &&
+      format !== "heic"
+    )
+      return file;
 
     // Do not turn an animated upload into an arbitrary still image.
     if (format === "png" || format === "webp") {
@@ -371,9 +378,9 @@ export default function (component) {
         const { naturalWidth: width, naturalHeight: height } = image;
         if (!width || !height)
           throw new Error("We could not open that photo. Choose another one.");
-        if (width * height > maxPhotoPixels) {
+        if (width * height > maxDecodePixels) {
           throw new Error(
-            "This photo is over 24 megapixels. Try a smaller copy or a screenshot.",
+            "This photo is over 64 megapixels. Try a smaller copy or a screenshot.",
           );
         }
         if (Math.max(width, height) > 32 * Math.min(width, height)) {
@@ -660,10 +667,17 @@ export default function (component) {
         render();
       }
     }, 60000);
-    setTriggerValue("predict", request);
+    try {
+      setTriggerValue("predict", request);
+    } catch {
+      clearPrediction();
+      showNotice("Could not send the photo. Tap Predict Animal to try again.");
+      render();
+    }
   });
   if (data.result && data.result.id === state.requestId) {
     clearTimeout(root.pendingTimer);
+    state.requestId = null;
     state.pending = false;
     if (data.result.error) {
       state.result = null;
