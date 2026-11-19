@@ -4,6 +4,10 @@ Classify Cat, Dog, Cow, Horse and Sheep photographs with Logistic Regression. Th
 
 The original raw-pixel models are preserved. The improved models still use Logistic Regression as the final classifier, but receive image features from a frozen pretrained CNN. Those pretrained features are part of the method and explain much of the improvement.
 
+## Why start with Logistic Regression?
+
+Binary Logistic Regression makes the first task easy to follow: separate cats from dogs, turn a linear score into a probability with Sigmoid, and examine the mistakes. Multinomial Logistic Regression extends the same idea to five animals using Softmax. Both train quickly and give us a clear baseline before introducing CNNs.
+
 ## Results
 
 Accuracy and macro-F1 on the **same historical Animals-10 test images**:
@@ -24,7 +28,7 @@ The binary model's Cat recall rose from 8.03% to **95.98%**. It now predicts Dog
 
 The historical test results were already inspected before this improvement study. They are useful for comparison, but they are not an untouched final assessment.
 
-After fixing the models, we also evaluated a separately collected iNaturalist sample with observation dates in 2025–2026. Selection used photo licenses, source IDs and duplicate checks, without model predictions. Visual review excluded 14 observations showing only bones, teeth, tracks or dung, before inference. Difficult animal photographs were retained, and excluded observations were not replaced.
+After fixing the models, we also evaluated a separately collected iNaturalist sample with observation dates in 2025 to 2026. Selection used photo licenses, source IDs and duplicate checks, without model predictions. Visual review excluded 14 observations showing only bones, teeth, tracks or dung, before inference. Difficult animal photographs were retained, and excluded observations were not replaced.
 
 | Model | External animal photos | Accuracy | Macro-F1 |
 | --- | ---: | ---: | ---: |
@@ -49,6 +53,25 @@ This sample contains distant, dark and partly hidden animals. It shows that the 
 The selected folders contain 12,840 files. Original preparation found no corrupt images or exact pixel duplicates and excluded one visually confirmed label error, leaving **12,839 images**. Perceptual hashing found 1,108 candidate related pairs. Detected connected groups stay in one split, including uncertain matches. The target 70/15/15 proportions produce 8,986 / 1,928 / 1,925 images because groups remain intact. Seed 42 and the original image IDs are unchanged in the improvement study.
 
 Kaggle lists GPL-2.0, but the collection came from Google Images without individual photo credits. Dataset photographs and image-bearing notebook outputs are therefore kept out of Git. See the [dataset license record](outputs/dataset_license.md). The external audit uses only CC0, CC BY or CC BY-SA photographs, with source links, credits, licenses and hashes recorded in its [fixed manifest](outputs/improved/external_manifest.csv). External images also stay local.
+
+## Why did the accuracy improve?
+
+Raw pixels describe colour at fixed positions. An animal moving across the frame, a different background or a change in lighting can change those inputs dramatically. Resizing to a small square also removes detail. A linear classifier on these values has little help recognizing the same animal in different poses. Dog was the largest class, and the original models leaned heavily toward it; the binary model missed most cats.
+
+Small experiments with resolution, regularization and class weights exposed that limit. Accuracy rose sharply when we changed the input. A frozen pretrained CNN converts each image into 576 visual features, and Logistic Regression learns to use them to distinguish the animals. Pretraining supplies visual knowledge learned from ImageNet; it is part of the system's complexity and prior data, even though we do not retrain the extractor.
+
+```mermaid
+flowchart LR
+    A[Animal photo] --> B[Resize, crop and normalize]
+    B --> C[Frozen pretrained CNN features]
+    C --> D[Logistic Regression]
+    D --> E[Sigmoid]
+    D --> F[Softmax]
+    E --> G[Cat or Dog prediction]
+    F --> H[Five-animal prediction]
+```
+
+The CNN comparison uses the same frozen backbone with a learned neural head. On the historical split it beat five-class Logistic Regression by 0.42 percentage points; on the small external sample Logistic Regression did better. Neither result establishes a universal winner. Better features helped far more than simply adding class weights, while the external accuracy drop shows how much the image source still matters.
 
 ## How the models work
 
@@ -88,23 +111,48 @@ If `.venv` already exists, activate it instead of recreating it. A fresh clone u
 | Kaggle, requests | Download the original data and fixed external images |
 | Jupyter, nbclient | Read and execute notebooks |
 
-## Prediction demo
+## Run the web app
 
-The saved models and preprocessing are included. Prediction does not require the training dataset or a new pretrained-weight download.
+The saved models are included. The app needs neither the training dataset nor a new pretrained-weight download. For the app alone, create and activate a Python 3.12 virtual environment as above, then install the smaller production requirements:
+
+```bash
+python -m pip install -r web/requirements.txt
+python -m streamlit run web/app.py
+```
+
+Open the local address shown by Streamlit. Upload a JPG, PNG or WEBP photo, take a camera photo, or swipe through ten licensed examples. Five-class Logistic Regression is the default; Cat and Dog mode uses the binary classifier. The app shows an image preview and all class probabilities. The footer credits its developer. Uploaded photos are processed in memory on the server and are not saved. Uploads are limited to 8 MB and 24 megapixels. Camera use needs browser permission and a secure context such as localhost or HTTPS.
+
+Streamlit provides the server and supported Components v2 interface. ONNX Runtime executes an export of the unchanged frozen feature extractor on CPU; scikit-learn runs Logistic Regression. NumPy, Pillow and joblib handle preprocessing and model loading. Production does not import PyTorch, notebooks or training code. The self-hosted fonts and example photos have individual license records under `web/assets/`.
+
+The original comparison demo remains available after installing the full research requirements:
 
 ```bash
 python demo.py
-```
-
-Open [the local demo](http://127.0.0.1:8765), select a model, choose an image and click Predict animal. Five-class Logistic Regression is the default. Binary mode supports only Cat and Dog. The page shows all supported-class probabilities. Images are processed in memory and are not saved. Stop the server with Ctrl+C.
-
-For a single file:
-
-```bash
 python demo.py --image "/absolute/path/to/animal.jpg" --model softmax_features
 ```
 
-Other choices include `binary_features`, `transfer_cnn`, and the original `binary`, `softmax` and `cnn`. Each saved model uses its own preprocessing. These are uncalibrated estimates: an unrelated animal or object will still receive a supported label.
+It supports `binary_features`, `softmax_features`, `transfer_cnn`, and the original `binary`, `softmax` and `cnn`. Each uses its recorded preprocessing. Probabilities are uncalibrated estimates: an unrelated animal or object will still receive a supported label.
+
+## Model size and deployment cost
+
+| Saved artifact | Bytes | Size |
+| --- | ---: | ---: |
+| Original binary LR classifier | 46,152 | 45.07 KiB |
+| Original five-class LR classifier | 72,117 | 70.43 KiB |
+| Improved binary LR classifier, including scaler | 16,351 | 15.97 KiB |
+| Improved five-class LR classifier, including scaler | 24,981 | 24.40 KiB |
+| Frozen feature extractor, research PyTorch format | 3,830,651 | 3.65 MiB |
+| Same extractor, web ONNX format | 3,717,004 | 3.54 MiB |
+| Original small CNN, complete weights | 361,413 | 352.94 KiB |
+| Transfer CNN, complete weights | 4,129,209 | 3.94 MiB |
+| Web five-class LR pipeline: ONNX extractor + classifier + preprocessing | 3,742,557 | 3.57 MiB |
+| Web package supporting both LR modes | 3,758,908 | 3.58 MiB |
+
+KiB and MiB use powers of 1024. The five-class LR classifier takes 24.40 KiB on disk. Most of the complete 3.57 MiB pipeline comes from the CNN feature extractor. The original small CNN has smaller weights than the complete LR pipeline. The web totals exclude libraries, interface assets and the Python runtime.
+
+A clean production environment on the M3 Mac used 444.6 MiB for installed libraries. Standalone CPU inference had a median of 7.8 ms over the ten gallery photos. Import and model loading took 33.0 seconds in the first new-environment process and 3.09 seconds in a later fresh process. Peak resident memory was about 231 MiB after those photos and 503 MiB with a synthetic 24-megapixel JPEG. Streamlit adds overhead. Cloud cold starts and capacity under simultaneous use still need measurement. Full records are in [runtime measurements](outputs/web_runtime_profile.json).
+
+The web export preserved predicted classes for all 1,925 five-class and 979 binary historical test cases. The largest probability difference from recorded predictions was 0.0000119. Original weights and results remain unchanged. See [web checks](outputs/web_app_checks.json) and [deployment preparation](outputs/deployment_feasibility.md). Deployment to Streamlit Community Cloud is pending review.
 
 ## Reproduce the study
 
@@ -157,7 +205,7 @@ git config filter.notebook-clean.required true
 
 Training-label review found clear errors and mixed-animal scenes. Candidate flags are documented without automatic relabelling or changing the frozen comparison. The pretrained extractor's centre crop can miss small or off-centre animals. The external audit demonstrates this domain gap; label quality, composition and new data need further work. The classifier cannot detect unknown animals, locate animals in a scene or guarantee confidence calibration.
 
-Streamlit Community Cloud is the preferred future host. A later interface can add phone-camera input, upload, class probabilities and at least ten individually licensed example images with credits. Deployment, that example gallery and unknown-animal detection are future work. Nothing has been deployed, and Vercel remains untouched. See the [deployment note](outputs/deployment_feasibility.md).
+The web app makes the saved LR models easier to try, but deployment cannot fix the generalization gap. More representative, independently collected photographs and a new frozen evaluation would be needed before making broader accuracy claims. Unknown-animal detection remains future work. Physical phone and Safari camera checks are still pending; desktop upload, mobile layouts, a simulated live-camera capture and the native camera-file fallback have been checked locally.
 
 ## References
 

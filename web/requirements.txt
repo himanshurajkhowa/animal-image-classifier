@@ -1,0 +1,7 @@
+# Production only; Python 3.12. No PyTorch, training, plotting or dataset packages.
+streamlit==1.67.0
+onnxruntime==1.32.0
+scikit-learn==1.9.1
+numpy==2.5.5
+Pillow==13.0.0
+joblib==1.6.0

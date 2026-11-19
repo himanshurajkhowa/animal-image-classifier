@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "gallery_images": 10,
+  "gallery_modes_compared": 2,
+  "maximum_probability_difference_from_demo": 1.9073486328125e-06,
+  "input_validation": [
+    "Empty input",
+    "Invalid file content",
+    "Over 8 MB",
+    "Extreme aspect ratio",
+    "Animated image",
+    "JPEG / PNG / WEBP decoding",
+    "EXIF orientation"
+  ],
+  "model_package_bytes": {
+    "feature_extractor.onnx": 3717004,
+    "softmax_features.joblib": 24981,
+    "binary_features.joblib": 16351,
+    "improved_preprocessing.json": 572
+  },
+  "default_five_class_pipeline_bytes": 3742557,
+  "both_lr_modes_package_bytes": 3758908,
+  "historical_models_unchanged": true,
+  "historical_test_export_parity": {
+    "images": {
+      "softmax": 1925,
+      "binary": 979
+    },
+    "all_predicted_classes_unchanged": true,
+    "maximum_probability_difference": 1.1864914627068845e-05
+  }
+}

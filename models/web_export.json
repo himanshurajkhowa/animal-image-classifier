@@ -1,0 +1,18 @@
+{
+  "source": "models/feature_extractor.pt",
+  "source_sha256": "865851942dd2f72b4f92f3f06347c8fa1d591509fad343009481aaa96c74f1ee",
+  "export": "models/feature_extractor.onnx",
+  "export_sha256": "032eb5ff71601d547d3f94593d25977252f09db2858788621e6892f857bf71ab",
+  "training_performed": false,
+  "opset": 17,
+  "input_shape": [
+    1,
+    3,
+    224,
+    224
+  ],
+  "output_shape": [
+    1,
+    576
+  ]
+}

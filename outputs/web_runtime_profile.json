@@ -1,0 +1,37 @@
+{
+  "measurement_environment": "Apple M3 MacBook Air, 8 GB RAM, macOS, Python 3.12.13, CPU only",
+  "first_new_environment_process": {
+    "platform": "darwin",
+    "python": "3.12.13",
+    "onnxruntime": "1.32.0",
+    "device": "CPU",
+    "cold_import_and_model_load_seconds": 33.00740633299938,
+    "gallery_mean_prediction_ms": 11.468900100226165,
+    "gallery_median_prediction_ms": 8.391562500946748,
+    "peak_rss_bytes_including_24mp_photo": 495140864,
+    "training_and_plotting_modules_loaded": false
+  },
+  "repeat_fresh_process": {
+    "platform": "darwin",
+    "python": "3.12.13",
+    "onnxruntime": "1.32.0",
+    "device": "CPU",
+    "cold_import_and_model_load_seconds": 3.088897999999972,
+    "gallery_mean_prediction_ms": 10.681454000223312,
+    "gallery_median_prediction_ms": 7.844312000088394,
+    "peak_rss_bytes_including_24mp_photo": 527646720,
+    "peak_rss_after_model_load_bytes": 226066432,
+    "peak_rss_after_gallery_bytes": 242630656,
+    "training_and_plotting_modules_loaded": false,
+    "pytorch_loaded": false
+  },
+  "production_site_packages_bytes": 466224532,
+  "production_dependency_environment_only": true,
+  "linux_dependency_resolution": "Passed for Python 3.12, x86_64 GNU/Linux; runtime execution measured on macOS only",
+  "notes": [
+    "Cold startup depends on filesystem/cache and hosting conditions.",
+    "Memory profile includes a synthetic 24-megapixel JPEG workload.",
+    "Streamlit server overhead is additional to the standalone inference profile.",
+    "No training or user-upload files are loaded or saved."
+  ]
+}
