@@ -2,6 +2,8 @@
 
 Classify photos of cats, dogs, cows, horses and sheep. The project starts with Logistic Regression on raw pixels, then tests how much better it works with features from a pretrained CNN. A small CNN and a transfer-learning model provide comparisons.
 
+[Try the live Animal Classifier](https://animalxclassifier.streamlit.app/)
+
 ## How it works
 
 Binary Logistic Regression uses Sigmoid to estimate the probability that a photo shows a dog. At a probability of 0.5 or higher, it predicts Dog. The multiclass model learns one score per animal. Softmax turns the five scores into probabilities that add up to one.

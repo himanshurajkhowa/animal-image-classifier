@@ -1,6 +1,6 @@
 # Streamlit deployment preparation
 
-The app is ready for local review. No cloud deployment or hosting-account changes have been made. Vercel is untouched.
+The app is live on [Streamlit Community Cloud](https://animalxclassifier.streamlit.app/). Its build logs confirmed Python 3.12.16 and the production requirements in `web/requirements.txt`.
 
 ## Run locally
 
@@ -17,7 +17,7 @@ The application uses Streamlit's supported Components v2 API for its isolated HT
 
 Use the existing `himanshurajkhowa/animal-image-classifier` repository, branch `main`, entry point `web/app.py`, and select Python 3.12 in Advanced settings. Community Cloud searches the entry-point folder for dependencies, so `web/requirements.txt` supplies the inference-only environment. The root `requirements.txt` remains the full research environment. The root `.streamlit/config.toml` supplies the theme and upload limit. No app secret, dataset download, pretrained-weight download or training step is required.
 
-Deployment is pending review. The web app uses its inference environment and the models already committed to the repository.
+The web app uses its inference environment and the models already committed to the repository.
 
 ## Inference package
 
@@ -44,7 +44,7 @@ Measurements used a clean production-only environment on the Apple M3 MacBook Ai
 - Ten gallery photos: median inference 7.8 ms, including decoding and preprocessing, excluding browser/transport latency.
 - Peak resident memory: about 216 MiB after model loading, 231 MiB after gallery predictions and 503 MiB after a synthetic 24-megapixel JPEG workload.
 
-These are standalone inference measurements. Streamlit, browser payloads and simultaneous sessions add memory and latency. Linux Python 3.12 dependency resolution passed, but Linux/cloud execution and hosted concurrency have not been measured. Community Cloud's published approximate memory range is 690 MB to 2.7 GB, subject to change; its actual allocation and cold-start behaviour must be checked after a reviewed deployment. The local measurements are evidence of feasibility, not a capacity guarantee.
+These are standalone inference measurements. Streamlit, browser payloads and simultaneous sessions add memory and latency. Linux dependency installation and cloud predictions passed. Hosted concurrency has not been measured. Community Cloud's published approximate memory range is 690 MB to 2.7 GB, subject to change; its actual allocation and cold-start behaviour must be checked after a reviewed deployment. The local measurements are evidence of feasibility, not a capacity guarantee.
 
 ## Verification and remaining checks
 
@@ -52,7 +52,7 @@ These are standalone inference measurements. Streamlit, browser payloads and sim
 
 Local browser checks cover welcome/main transitions, upload, both LR modes, prediction bars, reset, gallery navigation, photo credits, narrow layouts, reduced motion, simulated live-camera capture with camera-track cleanup, and the native camera-file fallback. The app accepts still images up to 8 MB and 24 megapixels. HEIC must be exported as JPEG. Camera access requires permission and HTTPS or localhost. A phone's localhost address refers to the phone itself, so a real phone test needs a suitable secure served address after deployment review.
 
-Physical iPhone/Android camera behaviour, Safari and Community Cloud remain untested. The ten example photos are demonstration assets, not an accuracy benchmark. They were selected without classifier predictions and checked against training/external photo IDs and perceptual hashes; this cannot prove absolute independence from all pretraining sources.
+Physical iPhone/Android camera behaviour and Safari remain untested. The public Cloud app loaded and completed gallery and upload predictions in a separate browser session. The ten example photos are demonstration assets, not an accuracy benchmark. They were selected without classifier predictions and checked against training/external photo IDs and perceptual hashes; this cannot prove absolute independence from all pretraining sources.
 
 The five-class historical accuracy is 94.23%; the separate 86-photo external evaluation is 58.14%. Both appear in the app's About dialog. No probability calibration or unknown-animal detection is claimed.
 
