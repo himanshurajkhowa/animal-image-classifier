@@ -1,0 +1,10 @@
+{
+  "model": "softmax_features",
+  "features": "576 frozen pretrained CNN features; Logistic Regression classifier",
+  "C": 0.01,
+  "class_weight": null,
+  "cv_macro_f1": 0.9313315056597019,
+  "validation_accuracy": 0.9481327800829875,
+  "validation_macro_f1": 0.9432726023915261,
+  "training_seconds": 1.7642002089996822
+}

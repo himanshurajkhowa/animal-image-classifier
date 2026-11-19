@@ -1,0 +1,24 @@
+{
+  "source": "iNaturalist public observations API",
+  "observed_from": "2025-01-01",
+  "observed_to": "2026-11-18",
+  "target_per_class": 20,
+  "selection": "Most recent observation IDs, first licensed primary photo, at most one observation per observer per class; skip detected related images. No model predictions used.",
+  "licenses": [
+    "cc0",
+    "cc-by",
+    "cc-by-sa"
+  ],
+  "taxa": {
+    "Cat": 118552,
+    "Dog": 47144,
+    "Cow": 74113,
+    "Horse": 209233,
+    "Sheep": 121578
+  },
+  "limits": "Observation dates and labels are contributor supplied. This is a small external audit, not a representative deployment benchmark.",
+  "visual_eligibility_rule": "Before predictions: exclude isolated skeletal remains, teeth, footprints and dung; retain blurry, distant, low-light, partly occluded and otherwise difficult animal photos. No replacement or model-driven exclusion. Report both all observations and eligible animal photographs.",
+  "reviewed_observations": 100,
+  "eligible_animal_photographs": 86,
+  "frozen_manifest_sha256": "c58c709c7b7ac9d67f7efa787f02bd4670e887a79cdf2918cb0343f24c86c982"
+}

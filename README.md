@@ -1,32 +1,71 @@
 # Animal image classifier
 
-A summer-training project by Himanshu Rajkhowa, B.Tech CSE, The Assam Royal Global University. It classifies photographs as Cat, Dog, Cow, Horse or Sheep and compares three approaches: binary Logistic Regression, five-class multinomial Logistic Regression and a small CNN.
+Classify Cat, Dog, Cow, Horse and Sheep photographs with Logistic Regression. The project follows a simple sequence: prepare the data, learn binary classification with Sigmoid, extend it to five classes with Softmax, then compare against CNNs.
 
-This is an implementation for university evaluation based on learning through IBM SkillsBuild. Data Analysis with Python was completed; Supervised Learning Methods is ongoing. The university report is deferred until the logo and required format are supplied.
+The original raw-pixel models are preserved. The improved models still use Logistic Regression as the final classifier, but receive image features from a frozen pretrained CNN. Those pretrained features are part of the method and explain much of the improvement.
 
-## Measured results
+## Results
 
-These are actual held-out results from the saved models, not the examples in the earlier presentation. Precision, recall and F1 below are macro averages.
+Accuracy and macro-F1 on the **same historical Animals-10 test images**:
 
-| Model | Accuracy | Precision | Recall | F1 | Saved size | Training time |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| binary | 72.73% | 0.548 | 0.514 | 0.484 | 0.044 MiB | 0.96 s |
-| softmax | 47.48% | 0.426 | 0.384 | 0.390 | 0.069 MiB | 6.60 s |
-| cnn | 63.27% | 0.611 | 0.575 | 0.586 | 0.345 MiB | 53.73 s |
+| Model | Previous accuracy | Improved accuracy | Previous macro-F1 | Improved macro-F1 |
+| --- | ---: | ---: | ---: | ---: |
+| Binary Logistic Regression | 72.73% | **98.26%** | 48.43% | **97.70%** |
+| Five-class Logistic Regression | 47.48% | **94.23%** | 39.01% | **93.54%** |
+| CNN comparison | 63.27% | 94.65% | 58.56% | 94.24% |
 
-The binary task has 979 test images; the five-class models use the same 1,925 test images. Binary accuracy is below the 74.57% always-Dog baseline. Cat recall is only 8.03%, so its accuracy hides weak Cat detection. Dog precision, recall and F1 are 0.751, 0.948 and 0.838. The five-class majority baseline is 37.92% accuracy.
+The binary task has 979 test images; the five-class tasks share 1,925. Macro-F1 averages the class F1 scores equally, so weak performance on smaller classes remains visible. Notebook summaries also show precision and recall as percentages.
 
-The CNN improves five-class accuracy by 15.79 percentage points over Logistic Regression. This comparison also changes input resolution, from 24 × 24 to 64 × 64 pixels, so it does not isolate architecture alone. Logistic Regression timing includes all three-fold regularization searches and refitting; CNN timing includes training and validation for 20 epochs. The CNN saved epoch 19, selected by validation loss; its early-stopping patience was not exhausted.
+The binary model's Cat recall rose from 8.03% to **95.98%**. It now predicts Dog for 74.87% of test images, close to the actual 74.57%, compared with 94.08% previously. Five-class Dog predictions fell from 55.06% to 38.03%, close to the actual 37.92%.
 
-![Five-class model comparison](outputs/model_comparison.png)
+![Historical model comparison](outputs/improved/performance_comparison.png)
 
-Class-wise reports, confusion matrices, CV scores, learning curves, predictions and exact split IDs are in `outputs/`. Numerical results are preserved even where performance is weak.
+### A separate external check
 
-## Prerequisites and setup
+The historical test results were already inspected before this improvement study. They are useful for comparison, but they are not an untouched final assessment.
 
-Tested on a MacBook Air with Apple M3, 8 GB RAM and macOS, using Python **3.12.13**. Use Python 3.12; Python 3.14 is not the tested environment. The dependency versions are pinned in `requirements.txt`. You need Python 3.12 with pip/venv, an internet connection for installation and the dataset, and a browser for the demo. Reserve roughly 3 GB of free disk space for data, dependencies and generated files. Training ran with Apple MPS acceleration; CPU training is supported but slower. No GPU package, API key or paid cloud service is required for the classifier.
+After fixing the models, we also evaluated a separately collected iNaturalist sample with observation dates in 2025–2026. Selection used photo licenses, source IDs and duplicate checks, without model predictions. Visual review excluded 14 observations showing only bones, teeth, tracks or dung, before inference. Difficult animal photographs were retained, and excluded observations were not replaced.
 
-From the existing project:
+| Model | External animal photos | Accuracy | Macro-F1 |
+| --- | ---: | ---: | ---: |
+| Binary Logistic Regression | 37 | **64.86%** | 64.76% |
+| Five-class Logistic Regression | 86 | **58.14%** | 58.35% |
+| CNN comparison | 86 | 53.49% | 52.46% |
+
+This sample contains distant, dark and partly hidden animals. It shows that the strong Animals-10 scores do **not** establish 85%+ accuracy on arbitrary new photos. The external sample is small and not representative of every use case. Contributor dates and imperfect hashing cannot prove complete source independence from either dataset or pretraining. Results for all 100 observations, including non-animal remains, and Wilson accuracy intervals are also saved in `outputs/improved/`. No model was tuned after seeing these results.
+
+## Data and preparation
+
+[Animals-10 by Alessio Corrado](https://www.kaggle.com/datasets/alessiocorrado99/animals10), version 2, contains 26,179 images in ten Italian-labelled folders. We select:
+
+| Folder | Class | Training | Validation | Test |
+| --- | --- | ---: | ---: | ---: |
+| `gatto` | Cat | 1,168 | 251 | 249 |
+| `cane` | Dog | 3,402 | 731 | 730 |
+| `mucca` | Cow | 1,305 | 280 | 280 |
+| `cavallo` | Horse | 1,837 | 393 | 393 |
+| `pecora` | Sheep | 1,274 | 273 | 273 |
+
+The selected folders contain 12,840 files. Original preparation found no corrupt images or exact pixel duplicates and excluded one visually confirmed label error, leaving **12,839 images**. Perceptual hashing found 1,108 candidate related pairs. Detected connected groups stay in one split, including uncertain matches. The target 70/15/15 proportions produce 8,986 / 1,928 / 1,925 images because groups remain intact. Seed 42 and the original image IDs are unchanged in the improvement study.
+
+Kaggle lists GPL-2.0, but the collection came from Google Images without individual photo credits. Dataset photographs and image-bearing notebook outputs are therefore kept out of Git. See the [dataset license record](outputs/dataset_license.md). The external audit uses only CC0, CC BY or CC BY-SA photographs, with source links, credits, licenses and hashes recorded in its [fixed manifest](outputs/improved/external_manifest.csv). External images also stay local.
+
+## How the models work
+
+- Binary Logistic Regression computes a linear score and uses Sigmoid to estimate Dog probability. The threshold is 0.5; Cat is 0 and Dog is 1.
+- Multinomial Logistic Regression learns one score per animal. Softmax converts the scores into probabilities that sum to one, and the largest determines the label.
+- The improved input is a 576-value feature vector from frozen ImageNet-pretrained MobileNetV3-Small. Its documented preprocessing resizes the short edge to 256, centre-crops to 224 × 224, and applies ImageNet normalization. Logistic Regression then learns the classification weights. This is **pretrained-feature Logistic Regression**, not a purely raw-pixel model.
+- The CNN comparison freezes the same backbone and trains a small five-class neural head. The original CNN trained from scratch is retained.
+
+Three stratified group folds inside the training set select C from 0.01, 0.1 and 1, with or without balanced class weights. StandardScaler is inside the Pipeline, so each fold fits scaling only on its training images. Both feature classifiers selected C = 0.01 without class weighting by CV macro-F1. Validation is reported separately; no test score selected settings.
+
+A small raw-pixel experiment also compared balanced class weights, 24/32-pixel inputs and two regularization strengths. Weighting improved macro-F1 but lowered accuracy: the selected binary model scored 60.88% accuracy / 55.65% macro-F1, and the five-class model scored 39.84% / 39.40%. It did not solve the weak representation. All candidates and CV evidence remain in supporting outputs.
+
+The CNN head uses training-only crop/flip augmentation, inverse-frequency class weights and Adam. Validation loss chooses a checkpoint within eight epochs, with patience three. Its backbone was not fine-tuned. Training curves and full epoch records are saved.
+
+## Setup
+
+Tested on an Apple M3 MacBook Air with 8 GB RAM and **Python 3.12.13**. Use Python 3.12. CPU inference works; training uses Apple MPS when available. Reserve about 3 GB for dependencies, data and generated files. No paid service or AI API key is needed.
 
 ```bash
 cd "$HOME/Desktop/animal classifier"
@@ -35,122 +74,96 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-If `.venv` already exists, activate it and use it; there is no need to recreate it. On this Mac it is already installed. A fresh download from GitHub uses the same steps inside the cloned repository.
+If `.venv` already exists, activate it instead of recreating it. A fresh clone uses the same commands from its own folder.
 
-The main libraries are:
-
-| Library | Practical purpose |
+| Library | Purpose |
 | --- | --- |
-| Pillow | Read images, apply EXIF orientation, convert to RGB and resize |
-| NumPy | Store and normalize pixel arrays |
-| pandas | Organize image labels, splits and result tables |
-| Matplotlib | Plot sample images, distributions, confusion matrices and learning curves |
-| scikit-learn | Logistic Regression, fold-specific scaling, group-aware splits and metrics |
-| PyTorch | Define and train the CNN, using MPS when available |
-| ImageHash | Find candidate near duplicates, including reflected versions |
-| SciPy | Check sigmoid and Softmax probability calculations |
-| joblib | Save and reload Logistic Regression pipelines |
-| Kaggle | Download the original dataset through its official API client |
-| Jupyter and nbclient | Read the notebooks and execute them in order |
+| Pillow, torchvision | Read images and apply the correct transforms |
+| NumPy, pandas | Store features, labels, splits and result tables |
+| Matplotlib | Plot distributions, curves, confusion matrices and predictions |
+| scikit-learn | Logistic Regression, Pipelines, group CV and metrics |
+| PyTorch | Frozen feature extraction and CNN training |
+| ImageHash | Identify candidate related images |
+| SciPy, joblib | Sigmoid/Softmax calculations and saved classifiers |
+| Kaggle, requests | Download the original data and fixed external images |
+| Jupyter, nbclient | Read and execute notebooks |
 
-## Dataset and preparation
+## Prediction demo
 
-Download [Animals-10 by Alessio Corrado](https://www.kaggle.com/datasets/alessiocorrado99/animals10), version 2, using the supported Kaggle client:
+The saved models and preprocessing are included. Prediction does not require the training dataset or a new pretrained-weight download.
+
+```bash
+python demo.py
+```
+
+Open [the local demo](http://127.0.0.1:8765), select a model, choose an image and click Predict animal. Five-class Logistic Regression is the default. Binary mode supports only Cat and Dog. The page shows all supported-class probabilities. Images are processed in memory and are not saved. Stop the server with Ctrl+C.
+
+For a single file:
+
+```bash
+python demo.py --image "/absolute/path/to/animal.jpg" --model softmax_features
+```
+
+Other choices include `binary_features`, `transfer_cnn`, and the original `binary`, `softmax` and `cnn`. Each saved model uses its own preprocessing. These are uncalibrated estimates: an unrelated animal or object will still receive a supported label.
+
+## Reproduce the study
+
+Download the original dataset with its official client:
 
 ```bash
 mkdir -p data/raw data/processed
 kaggle datasets download -d alessiocorrado99/animals10 -p data/raw --unzip
 ```
 
-The public download worked without credentials in this run. If Kaggle asks you to authenticate, use `kaggle auth login` or follow its official authentication instructions. Keep credentials outside this repository and never commit them.
+The public download worked without credentials during this run. If authentication is required, use `kaggle auth login`. Keep credentials outside the repository.
 
-The archive expands to `data/raw/raw-img/`. Its 26,179 images cover ten Italian labels. We map `gatto`, `cane`, `mucca`, `cavallo` and `pecora` to Cat, Dog, Cow, Horse and Sheep. There are 12,840 files in these folders. Full decoding found no corrupt images and no exact byte/pixel duplicates. Visual review excluded one wrongly labelled horse from the Cow folder, leaving **12,839 images**.
+Read or execute the four numbered notebooks in order:
 
-Perceptual hashes identify 1,108 candidate pairs. All detected related groups stay in one split, including uncertain matches. The target split is 70% training, 15% validation and 15% test, with seed 42 and stratified grouping. Actual counts are 8,986 / 1,928 / 1,925 because groups must stay intact. The split manifest and review decision are saved; no test score informed cleaning or model selection.
+1. Explore and prepare animal images.
+2. Cats vs dogs with Logistic Regression and Sigmoid.
+3. Five animals with multinomial Logistic Regression and Softmax.
+4. CNN comparison and evaluation.
 
-Kaggle lists GPL-2.0, but its description says images came from Google Images and supplies no individual image licenses. See [the source and license record](outputs/dataset_license.md). Images, resized arrays and image-bearing outputs stay local. The small fitted models, numerical records and image-free charts are included so saved inference can be inspected and reproduced.
-
-## Run the notebooks
-
-Run these four notebooks in order:
-
-1. `01_Explore_and_Prepare_Animal_Images.ipynb`: source labels, integrity checks, duplicate groups, visual cleaning, EDA, fixed splits and pixel arrays.
-2. `02_Cats_vs_Dogs_Binary_Logistic_Regression.ipynb`: Cat = 0, Dog = 1, logits, sigmoid, the 0.5 threshold, CV and real TP/TN/FP/FN examples.
-3. `03_Five_Animals_Multinomial_Logistic_Regression.ipynb`: five class scores, Softmax, class-wise evaluation and probability plots.
-4. `04_Five_Animals_Small_CNN.ipynb`: a small CNN, validation-based checkpoint selection, learning curves and the model comparison.
-
-For an interactive session:
+For Jupyter:
 
 ```bash
 python -m ipykernel install --prefix .venv --name animal-classifier --display-name "Animal classifier Python"
 JUPYTER_PATH="$PWD/.venv/share/jupyter" python -m notebook notebooks
 ```
 
-Choose the Animal classifier Python kernel. Use Run All Cells in each notebook before moving to the next. Paths work from the project or `notebooks/` directory.
+Choose the Animal classifier Python kernel. The notebooks reuse completed preparation and saved experiments by default. On a fresh data download, notebook 01 builds the processed arrays. Set `RETRAIN = True` in a model notebook only when deliberately retraining it. Detailed searches and logs are kept outside the main notebook output.
 
-To execute the complete workflow without opening Jupyter:
+For a complete training reproduction after data preparation:
 
 ```bash
+python train_improved.py --stage all
 python run_notebooks.py
-python verify.py
+python assess_external.py --download --run-name reproduction
+python verify.py --external-run reproduction
 ```
 
-This retrains the models and updates outputs. To resume after completed preparation and baseline notebooks, use `python run_notebooks.py --start 4`, for example. The local notebooks retain their real outputs. Published notebook copies have outputs cleared to avoid redistributing photographs; rerunning them fills the outputs again.
+Feature extraction reuses the included frozen backbone. If that file is absent, it downloads official pretrained weights into the ignored `models/pretrained_cache/` folder. The feature cache is tied to the split-manifest hash. Use `--stage logistic` or `--stage transfer` for a specific part, and `--resume` to skip completed Logistic Regression experiments. MPS training can vary slightly between runs. The external assessor freezes model fingerprints and refuses to silently overwrite the original audit with changed models; `--run-name` records a retrained version separately, and `--external-run` verifies that named audit. Use a new name for each changed model. Reusing these external images is a reproducibility check, not a fresh independent test.
 
-## How training and validation work
+The original source and notebook version is preserved by Git tag `baseline-raw-pixels`. Original models and results keep their filenames. New experiment records are under `outputs/improved/`, including the plan, diagnostic review, candidate settings, CV scores, validation behaviour, historical predictions, external audit and verification record.
 
-Both Logistic Regression models flatten normalized 24 × 24 RGB arrays. A scikit-learn Pipeline fits StandardScaler inside each training fold. Three StratifiedGroupKFold folds choose C from 0.0001, 0.001 and 0.01 using macro-F1 on training data only. The independent validation set measures generalization; the test set supplies the final metrics.
-
-The CNN receives normalized 64 × 64 RGB arrays. It has three convolution blocks, two linear layers, dropout and 89,509 trainable parameters. Adam uses learning rate 0.001 and weight decay 0.0001, with a 20-epoch cap and patience of four. Validation loss chooses the checkpoint. No pretrained weights or test-set tuning are used.
-
-Training/validation accuracy is 76.15%/72.91% for binary Logistic Regression, 58.34%/48.65% for five-class Logistic Regression, and 70.93%/62.97% for the selected CNN in evaluation mode. The five-class gaps support an overfitting concern; poor binary Cat recall also shows that raw pixels and imbalance limit the baseline. The CNN validation loss improved overall with some fluctuations, so there is no evidence of a persistent early-stopping plateau in this run.
-
-## Local prediction demo
-
-Saved models are included and do not require downloading the dataset for prediction. After installing dependencies:
-
-```bash
-python demo.py
-```
-
-Open [the local demo](http://127.0.0.1:8765), choose an image, select a model and click Predict animal. The page shows the label and all five estimated probabilities. Press Ctrl+C in the terminal to stop the server. The server listens only on this computer and processes uploads in memory without saving them.
-
-You can also predict a file from the terminal:
-
-```bash
-python demo.py --image "/absolute/path/to/animal.jpg" --model cnn
-```
-
-A real held-out Dog image, ID `3e50b7a3bd28845fe91b`, was predicted as Dog with **76.6%** estimated probability by the CNN and **66.3%** by five-class Logistic Regression. This is one example, not an overall accuracy claim.
-
-## Files and reproducibility
-
-`data/` keeps raw images separate from processed arrays. `models/` stores three small fitted files and the preprocessing configuration. `outputs/` preserves the split manifest, metrics and figures; its ignored `private/` folder contains photographs and review contact sheets. `report/` is reserved for the later university report.
-
-Only four Python helpers are shared: `common.py` keeps preprocessing and evaluation consistent, `demo.py` runs inference, `run_notebooks.py` executes notebooks and clears their outputs for Git, and `verify.py` checks split reproducibility, leakage, recorded metrics, selected-C CV scores and saved inference. `outputs/verification.json` records the checks and artifact hashes. All notebooks executed successfully, the selected-C CV scores were reproduced, and raw-image demo probabilities matched saved test predictions on 15 images per five-class model. CNN MPS training can vary slightly between runs; the saved weights preserve this run.
-
-The useful `.gitattributes` rule clears notebook outputs on Git check-in while preserving executed local notebooks. To enable it after cloning, run:
+The useful `.gitattributes` rule clears outputs on Git check-in while preserving executed notebooks locally. Enable it after cloning:
 
 ```bash
 git config filter.notebook-clean.clean '.venv/bin/python run_notebooks.py --strip'
 git config filter.notebook-clean.required true
 ```
 
-Datasets, `.venv`, caches, credentials and private figures are ignored. Agent skills are installed globally and are not part of the ML repository.
+## Limitations and future work
 
-## Learning and limitations
+Training-label review found clear errors and mixed-animal scenes. Candidate flags are documented without automatic relabelling or changing the frozen comparison. The pretrained extractor's centre crop can miss small or off-centre animals. The external audit demonstrates this domain gap; label quality, composition and new data need further work. The classifier cannot detect unknown animals, locate animals in a scene or guarantee confidence calibration.
 
-The project applies data wrangling, EDA, supervised classification, reproducible splitting, cross-validation and model evaluation learned during summer training. It connects sigmoid and Softmax equations to numerical predictions and makes class imbalance visible through class-wise recall and macro-F1.
-
-Performance is modest, especially for Cats and Cows. Labels were sample-reviewed, not fully re-annotated. A Horse photograph still labelled Dog was noticed after evaluation (ID `71c888b97f4ee9528f32`); it remains in the recorded test set, so scores are measured against imperfect dataset labels. Perceptual hashes can miss crops or related source images; source identities are unavailable. Square resizing distorts some images. Probabilities are uncalibrated, and an unrelated image is still assigned one of the five classes. This model has not been validated on a separate real-world collection. Model size alone does not measure hosting memory or dependency size.
-
-No Vercel deployment was made and no account settings were changed. The [deployment feasibility note](outputs/deployment_feasibility.md) recommends reusing the Python preprocessing and CPU checkpoint first. Browser ONNX inference remains a possible future option after export and preprocessing-parity tests. The hackathon retains priority over any hosting experiments.
+Streamlit Community Cloud is the preferred future host. A later interface can add phone-camera input, upload, class probabilities and at least ten individually licensed example images with credits. Deployment, that example gallery and unknown-animal detection are future work. Nothing has been deployed, and Vercel remains untouched. See the [deployment note](outputs/deployment_feasibility.md).
 
 ## References
 
-- [Original Animals-10 dataset](https://www.kaggle.com/datasets/alessiocorrado99/animals10)
-- [Official Kaggle CLI](https://github.com/Kaggle/kaggle-cli)
-- [scikit-learn Logistic Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
+- [Animals-10](https://www.kaggle.com/datasets/alessiocorrado99/animals10)
+- [Official Logistic Regression documentation](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
 - [Stratified group cross-validation](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedGroupKFold.html)
-- [Avoiding preprocessing leakage](https://scikit-learn.org/stable/common_pitfalls.html)
-- [PyTorch MPS backend](https://docs.pytorch.org/docs/stable/notes/mps.html)
+- [PyTorch transfer learning tutorial](https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html)
+- [Pretrained feature extractor and documented transforms](https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.mobilenet_v3_small.html)
+- [iNaturalist API](https://www.inaturalist.org/pages/api+reference) and [photo licensing](https://help.inaturalist.org/en/support/solutions/articles/151000169918-can-i-use-the-photos-and-sounds-that-are-posted-on-inaturalist-)

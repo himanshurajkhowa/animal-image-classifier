@@ -1,0 +1,45 @@
+{
+  "summary": {
+    "accuracy": 0.982635342185904,
+    "precision_macro": 0.9789510753224858,
+    "recall_macro": 0.9751251581669143,
+    "f1_macro": 0.9770183033340928,
+    "test_images": 979,
+    "model": "binary_features",
+    "features": "576 frozen pretrained CNN features; Logistic Regression classifier",
+    "C": 0.01,
+    "class_weight": null,
+    "cv_macro_f1": 0.9632153947468499,
+    "validation_accuracy": 0.9735234215885947,
+    "validation_macro_f1": 0.9646498490848171,
+    "training_seconds": 0.4763535829988541,
+    "assessment": "Previously inspected Animals-10 test split"
+  },
+  "class_report": {
+    "Cat": {
+      "precision": 0.9715447154471545,
+      "recall": 0.9598393574297188,
+      "f1-score": 0.9656565656565657,
+      "support": 249.0
+    },
+    "Dog": {
+      "precision": 0.9863574351978172,
+      "recall": 0.9904109589041096,
+      "f1-score": 0.9883800410116199,
+      "support": 730.0
+    },
+    "accuracy": 0.982635342185904,
+    "macro avg": {
+      "precision": 0.9789510753224858,
+      "recall": 0.9751251581669143,
+      "f1-score": 0.9770183033340928,
+      "support": 979.0
+    },
+    "weighted avg": {
+      "precision": 0.9825899508077098,
+      "recall": 0.982635342185904,
+      "f1-score": 0.9826005258293845,
+      "support": 979.0
+    }
+  }
+}

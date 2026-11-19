@@ -1,0 +1,10 @@
+{
+  "model": "binary_features",
+  "features": "576 frozen pretrained CNN features; Logistic Regression classifier",
+  "C": 0.01,
+  "class_weight": null,
+  "cv_macro_f1": 0.9632153947468499,
+  "validation_accuracy": 0.9735234215885947,
+  "validation_macro_f1": 0.9646498490848171,
+  "training_seconds": 0.4763535829988541
+}

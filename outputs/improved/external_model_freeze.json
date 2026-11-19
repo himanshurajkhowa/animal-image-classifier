@@ -1,0 +1,6 @@
+{
+  "models/binary_features.joblib": "d776963c027b65767411b7f9d91ea7be349d6bd816e33c615e7a52e0f1496d92",
+  "models/softmax_features.joblib": "182e4bfcf186fde4c32cc4088510acee2080d5bfb4ed46ec7107f11ba1487797",
+  "models/transfer_cnn.pt": "7bbe9fa20ad03ff482a61fb3dfd5954def2f1ae00c89ea20c92bceb628320604",
+  "models/feature_extractor.pt": "865851942dd2f72b4f92f3f06347c8fa1d591509fad343009481aaa96c74f1ee"
+}

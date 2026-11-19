@@ -1,0 +1,7 @@
+accuracy,precision_macro,recall_macro,f1_macro,test_images,assessment,sample_scope,accuracy_wilson_95,model
+0.65,0.65625,0.65,0.6464646464646464,40,"Small external audit, not used for training or tuning",all_observations,"[0.4950559699353738, 0.7786566682895086]",external_binary_features_all_observations
+0.6486486486486487,0.6621212121212121,0.6573529411764706,0.6476190476190475,37,"Small external audit, not used for training or tuning",animal_photos,"[0.48758729517569566, 0.7817459336889914]",external_binary_features_animal_photos
+0.52,0.6250505050505051,0.52,0.5197499953357338,100,"Small external audit, not used for training or tuning",all_observations,"[0.4231640509017654, 0.6153561567991945]",external_softmax_features_all_observations
+0.5813953488372093,0.6690966386554622,0.5798039215686275,0.5834891905480142,86,"Small external audit, not used for training or tuning",animal_photos,"[0.47584264364729545, 0.6799871723844758]",external_softmax_features_animal_photos
+0.48,0.5873076923076923,0.48,0.4685113029385475,100,"Small external audit, not used for training or tuning",all_observations,"[0.38464384320080547, 0.5768359490982345]",external_transfer_cnn_all_observations
+0.5348837209302325,0.6285544177185044,0.5347058823529413,0.5245736133715673,86,"Small external audit, not used for training or tuning",animal_photos,"[0.4302411599878987, 0.6365430468828602]",external_transfer_cnn_animal_photos

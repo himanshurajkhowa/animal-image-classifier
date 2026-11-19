@@ -1,0 +1,101 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "check": "Original models, metrics, predictions and split preserved byte for byte",
+      "passed": true
+    },
+    {
+      "check": "Original 70/15/15 stratified group split reproduced without leakage",
+      "passed": true
+    },
+    {
+      "check": "Four cleaned notebooks executed with no errors, convergence warnings or excessive diagnostics",
+      "passed": true
+    },
+    {
+      "check": "Frozen pretrained feature cache matches every manifest ID",
+      "passed": true
+    },
+    {
+      "check": "binary_features metrics and identical historical test IDs verified",
+      "passed": true
+    },
+    {
+      "check": "softmax_features metrics and identical historical test IDs verified",
+      "passed": true
+    },
+    {
+      "check": "transfer_cnn metrics and identical historical test IDs verified",
+      "passed": true
+    },
+    {
+      "check": "binary_weighted_pixels metrics and identical historical test IDs verified",
+      "passed": true
+    },
+    {
+      "check": "softmax_weighted_pixels metrics and identical historical test IDs verified",
+      "passed": true
+    },
+    {
+      "check": "binary_features fold-only scaling and selected-setting group CV reproduced",
+      "passed": true
+    },
+    {
+      "check": "softmax_features fold-only scaling and selected-setting group CV reproduced",
+      "passed": true
+    },
+    {
+      "check": "binary_features source-image saved inference verified",
+      "passed": true,
+      "sample_images": 6
+    },
+    {
+      "check": "softmax_features source-image saved inference verified",
+      "passed": true,
+      "sample_images": 15
+    },
+    {
+      "check": "transfer_cnn source-image saved inference verified",
+      "passed": true,
+      "sample_images": 15
+    },
+    {
+      "check": "binary_weighted_pixels source-image saved inference verified",
+      "passed": true,
+      "sample_images": 6
+    },
+    {
+      "check": "softmax_weighted_pixels source-image saved inference verified",
+      "passed": true,
+      "sample_images": 15
+    },
+    {
+      "check": "binary source-image saved inference verified",
+      "passed": true,
+      "sample_images": 6
+    },
+    {
+      "check": "softmax source-image saved inference verified",
+      "passed": true,
+      "sample_images": 15
+    },
+    {
+      "check": "cnn source-image saved inference verified",
+      "passed": true,
+      "sample_images": 15
+    },
+    {
+      "check": "External source licenses, frozen selection, model fingerprints and both audit scopes verified",
+      "passed": true,
+      "observations": 100,
+      "eligible_animal_photos": 86
+    }
+  ],
+  "limitations": [
+    "Historical test already inspected.",
+    "External audit is small, dated by contributors and not representative.",
+    "Hashing cannot prove complete source independence.",
+    "ImageNet pretraining is part of improved features."
+  ]
+}

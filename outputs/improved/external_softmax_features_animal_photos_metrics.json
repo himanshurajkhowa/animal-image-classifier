@@ -1,0 +1,61 @@
+{
+  "summary": {
+    "accuracy": 0.5813953488372093,
+    "precision_macro": 0.6690966386554622,
+    "recall_macro": 0.5798039215686275,
+    "f1_macro": 0.5834891905480142,
+    "test_images": 86,
+    "assessment": "Small external audit, not used for training or tuning",
+    "sample_scope": "animal_photos",
+    "accuracy_wilson_95": [
+      0.47584264364729545,
+      0.6799871723844758
+    ],
+    "model": "external_softmax_features_animal_photos"
+  },
+  "class_report": {
+    "Cat": {
+      "precision": 0.6875,
+      "recall": 0.55,
+      "f1-score": 0.6111111111111112,
+      "support": 20.0
+    },
+    "Dog": {
+      "precision": 0.5294117647058824,
+      "recall": 0.5294117647058824,
+      "f1-score": 0.5294117647058824,
+      "support": 17.0
+    },
+    "Cow": {
+      "precision": 0.7,
+      "recall": 0.4666666666666667,
+      "f1-score": 0.56,
+      "support": 15.0
+    },
+    "Horse": {
+      "precision": 1.0,
+      "recall": 0.47058823529411764,
+      "f1-score": 0.64,
+      "support": 17.0
+    },
+    "Sheep": {
+      "precision": 0.42857142857142855,
+      "recall": 0.8823529411764706,
+      "f1-score": 0.5769230769230769,
+      "support": 17.0
+    },
+    "accuracy": 0.5813953488372093,
+    "macro avg": {
+      "precision": 0.6690966386554622,
+      "recall": 0.5798039215686275,
+      "f1-score": 0.5834891905480142,
+      "support": 86.0
+    },
+    "weighted avg": {
+      "precision": 0.6690199335548173,
+      "recall": 0.5813953488372093,
+      "f1-score": 0.5849990061617969,
+      "support": 86.0
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "homepage": 200,
+  "models": [
+    {
+      "model": "binary_features",
+      "predicted_animal": "Dog",
+      "probability": 0.9997624754905701
+    },
+    {
+      "model": "softmax_features",
+      "predicted_animal": "Dog",
+      "probability": 0.9999709129333496
+    },
+    {
+      "model": "transfer_cnn",
+      "predicted_animal": "Dog",
+      "probability": 0.9999954700469971
+    },
+    {
+      "model": "softmax",
+      "predicted_animal": "Dog",
+      "probability": 0.663263738155365
+    },
+    {
+      "model": "cnn",
+      "predicted_animal": "Dog",
+      "probability": 0.765981912612915
+    }
+  ],
+  "invalid_image_status": 400
+}

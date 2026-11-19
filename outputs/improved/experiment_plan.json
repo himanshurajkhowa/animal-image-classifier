@@ -1,0 +1,63 @@
+{
+  "baseline_commit": "4618b820f879fa667b077fe995fc7e2ba161a427",
+  "manifest_sha256": "d841e2da8463fa2d58b2a0019f4c083f896975a706cb04560687c0e95a173beb",
+  "unchanged_categories": [
+    "Cat",
+    "Dog",
+    "Cow",
+    "Horse",
+    "Sheep"
+  ],
+  "raw_experiments": {
+    "resolution": [
+      24,
+      32
+    ],
+    "C": [
+      0.001,
+      0.01
+    ],
+    "class_weight": "balanced",
+    "selection": "validation macro-F1; selected-setting training-only 3-fold group CV"
+  },
+  "feature_lr": {
+    "backbone": "frozen ImageNet1K MobileNetV3-Small",
+    "feature_dimension": 576,
+    "C": [
+      0.01,
+      0.1,
+      1.0
+    ],
+    "class_weight": [
+      null,
+      "balanced"
+    ],
+    "selection": "training-only 3-fold stratified group CV macro-F1; validation independently reported"
+  },
+  "cnn_comparison": {
+    "frozen_backbone": true,
+    "trainable_head": [
+      576,
+      128,
+      5
+    ],
+    "max_epochs": 8,
+    "patience": 3,
+    "selection": "validation loss",
+    "class_weight": "inverse training class frequency"
+  },
+  "test_policy": "Historical Animals-10 test already inspected. No test-driven tuning or relabelling. No genuinely independent final collection available locally.",
+  "independence_limit": "Different dataset alone cannot certify novelty relative to ImageNet pretraining or Google Images sources.",
+  "historical_artifact_sha256": {
+    "models/binary.joblib": "4afc2662c7d437e3428bfe9932703ce36b01906ee8cf82915c419b968db088d6",
+    "models/softmax.joblib": "19278bbeefee296e0ec18ee2b61649efc33b733607ad1fda686dcc7718716b51",
+    "models/cnn.pt": "e071e0ec5a095ff8c2edfaf23cd7f641554aebc863300158d1f58b26ae2bacf6",
+    "models/preprocessing.json": "526641d9f41b47f99e32a61eed3725d65d4d75d1c6c19948392cc249d6c04d4d",
+    "outputs/binary_metrics.json": "fc3d748a85cde0f371ca1830eb40d86fffb9cc64e6d36dfefa997cd4aec21215",
+    "outputs/cnn_metrics.json": "1d7de3edd9e1fae940835a669570ac030ec643d9c378fbd8ca731251a093dac1",
+    "outputs/softmax_metrics.json": "f8e148ebdf3e11b50351ead43f550e516912f1a58880048c3a36315cb11e23ef",
+    "outputs/binary_predictions.csv": "e612faf842fe411c28972d459b4779ed6560d7af83a6144b9ba007195ce8d4b9",
+    "outputs/cnn_predictions.csv": "eff240091254f896f4a51c75a00773a93c851d094e86d16e21742c13a92e7224",
+    "outputs/softmax_predictions.csv": "9d5063e53be7eee585b32bd981bcfbbc92a17bb5ce172dba47e110cf93a63143"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "summary": {
+    "accuracy": 0.39844155844155843,
+    "precision_macro": 0.39764086953801314,
+    "recall_macro": 0.4190908907990053,
+    "f1_macro": 0.3939713785782767,
+    "test_images": 1925,
+    "size": 24,
+    "C": 0.01,
+    "class_weight": "balanced",
+    "validation_accuracy": 0.4196058091286307,
+    "validation_macro_f1": 0.4141993962453364,
+    "train_accuracy": 0.548408635655464,
+    "cv_macro_f1": 0.3854514355000473,
+    "features": "flattened RGB pixels",
+    "assessment": "Previously inspected Animals-10 test split",
+    "model": "softmax_weighted_pixels"
+  },
+  "class_report": {
+    "Cat": {
+      "precision": 0.2650862068965517,
+      "recall": 0.4939759036144578,
+      "f1-score": 0.3450210378681627,
+      "support": 249.0
+    },
+    "Dog": {
+      "precision": 0.5511627906976744,
+      "recall": 0.32465753424657534,
+      "f1-score": 0.4086206896551724,
+      "support": 730.0
+    },
+    "Cow": {
+      "precision": 0.3469387755102041,
+      "recall": 0.36428571428571427,
+      "f1-score": 0.3554006968641115,
+      "support": 280.0
+    },
+    "Horse": {
+      "precision": 0.488,
+      "recall": 0.46564885496183206,
+      "f1-score": 0.4765625,
+      "support": 393.0
+    },
+    "Sheep": {
+      "precision": 0.3370165745856354,
+      "recall": 0.4468864468864469,
+      "f1-score": 0.384251968503937,
+      "support": 273.0
+    },
+    "accuracy": 0.39844155844155843,
+    "macro avg": {
+      "precision": 0.39764086953801314,
+      "recall": 0.4190908907990053,
+      "f1-score": 0.3939713785782767,
+      "support": 1925.0
+    },
+    "weighted avg": {
+      "precision": 0.44118840765261264,
+      "recall": 0.39844155844155843,
+      "f1-score": 0.4030677334550516,
+      "support": 1925.0
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "training_counts": {
+    "Dog": 3402,
+    "Horse": 1837,
+    "Cow": 1305,
+    "Sheep": 1274,
+    "Cat": 1168
+  },
+  "images_smaller_than_64_pixels": 5,
+  "training_review_candidates": 15,
+  "automatic_relabelling": false,
+  "bias_comparison": {
+    "binary": {
+      "actual_dog_fraction": 0.745658835546476,
+      "original_dog_prediction_fraction": 0.940755873340143,
+      "improved_dog_prediction_fraction": 0.7487231869254342,
+      "original_cat_recall": 0.08032128514056225,
+      "improved_cat_recall": 0.9598393574297188
+    },
+    "softmax": {
+      "actual_dog_fraction": 0.37922077922077924,
+      "original_dog_prediction_fraction": 0.5506493506493506,
+      "improved_dog_prediction_fraction": 0.38025974025974024,
+      "original_cat_recall": 0.1285140562248996,
+      "improved_cat_recall": 0.9477911646586346
+    }
+  }
+}

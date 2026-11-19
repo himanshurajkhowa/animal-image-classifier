@@ -1,0 +1,61 @@
+{
+  "summary": {
+    "accuracy": 0.52,
+    "precision_macro": 0.6250505050505051,
+    "recall_macro": 0.52,
+    "f1_macro": 0.5197499953357338,
+    "test_images": 100,
+    "assessment": "Small external audit, not used for training or tuning",
+    "sample_scope": "all_observations",
+    "accuracy_wilson_95": [
+      0.4231640509017654,
+      0.6153561567991945
+    ],
+    "model": "external_softmax_features_all_observations"
+  },
+  "class_report": {
+    "Cat": {
+      "precision": 0.6111111111111112,
+      "recall": 0.55,
+      "f1-score": 0.5789473684210527,
+      "support": 20.0
+    },
+    "Dog": {
+      "precision": 0.5,
+      "recall": 0.45,
+      "f1-score": 0.47368421052631576,
+      "support": 20.0
+    },
+    "Cow": {
+      "precision": 0.6363636363636364,
+      "recall": 0.35,
+      "f1-score": 0.45161290322580644,
+      "support": 20.0
+    },
+    "Horse": {
+      "precision": 1.0,
+      "recall": 0.4,
+      "f1-score": 0.5714285714285714,
+      "support": 20.0
+    },
+    "Sheep": {
+      "precision": 0.37777777777777777,
+      "recall": 0.85,
+      "f1-score": 0.5230769230769231,
+      "support": 20.0
+    },
+    "accuracy": 0.52,
+    "macro avg": {
+      "precision": 0.6250505050505051,
+      "recall": 0.52,
+      "f1-score": 0.5197499953357338,
+      "support": 100.0
+    },
+    "weighted avg": {
+      "precision": 0.6250505050505051,
+      "recall": 0.52,
+      "f1-score": 0.5197499953357338,
+      "support": 100.0
+    }
+  }
+}

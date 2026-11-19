@@ -11,9 +11,10 @@ __pycache__/
 data/raw/
 data/processed/
 outputs/private/
-outputs/*log
+*.log
 outputs/google_catalog_session.json
 report/qa/
 report/*private*
 outputs/image_audit.csv
 outputs/project_status.md
+models/pretrained_cache/

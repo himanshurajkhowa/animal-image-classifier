@@ -1,0 +1,43 @@
+{
+  "summary": {
+    "accuracy": 0.6486486486486487,
+    "precision_macro": 0.6621212121212121,
+    "recall_macro": 0.6573529411764706,
+    "f1_macro": 0.6476190476190475,
+    "test_images": 37,
+    "assessment": "Small external audit, not used for training or tuning",
+    "sample_scope": "animal_photos",
+    "accuracy_wilson_95": [
+      0.48758729517569566,
+      0.7817459336889914
+    ],
+    "model": "external_binary_features_animal_photos"
+  },
+  "class_report": {
+    "Cat": {
+      "precision": 0.7333333333333333,
+      "recall": 0.55,
+      "f1-score": 0.6285714285714286,
+      "support": 20.0
+    },
+    "Dog": {
+      "precision": 0.5909090909090909,
+      "recall": 0.7647058823529411,
+      "f1-score": 0.6666666666666666,
+      "support": 17.0
+    },
+    "accuracy": 0.6486486486486487,
+    "macro avg": {
+      "precision": 0.6621212121212121,
+      "recall": 0.6573529411764706,
+      "f1-score": 0.6476190476190475,
+      "support": 37.0
+    },
+    "weighted avg": {
+      "precision": 0.6678951678951679,
+      "recall": 0.6486486486486487,
+      "f1-score": 0.646074646074646,
+      "support": 37.0
+    }
+  }
+}
