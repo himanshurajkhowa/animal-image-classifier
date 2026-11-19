@@ -2,12 +2,13 @@ export default function (component) {
   const { parentElement, data, setTriggerValue } = component;
   const root = parentElement.querySelector("#animal-app");
   const $ = (selector) => root.querySelector(selector);
-  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const state = (root.animalState ??= {
     stage: "welcome",
     photo: null,
     example: null,
     active: -1,
+    galleryOpen: false,
     result: null,
     pending: false,
     requestId: null,
@@ -28,7 +29,7 @@ export default function (component) {
   const focus = (element) => element.focus({ preventScroll: true });
   const scrollTo = (element, block = "nearest") =>
     element.scrollIntoView({
-      behavior: reduceMotion ? "auto" : "smooth",
+      behavior: reduceMotion.matches ? "auto" : "smooth",
       block,
       inline: "nearest",
     });
@@ -61,13 +62,6 @@ export default function (component) {
       caption.append(mark);
       button.append(image, caption);
       $("#gallery").append(button);
-      const dot = document.createElement("button");
-      dot.dataset.index = index;
-      dot.setAttribute(
-        "aria-label",
-        `Select gallery photo ${index + 1}: ${item.animal}`,
-      );
-      $("#gallery-dots").append(dot);
       const credit = document.createElement("div");
       credit.className = "credit-item";
       const title = document.createElement("strong");
@@ -94,7 +88,14 @@ export default function (component) {
     $("#welcome").hidden = state.stage !== "welcome";
     $("#classifier").hidden = state.stage !== "classify";
     $("#mode").value = state.mode;
+    $("#gallery-section").hidden = !state.galleryOpen;
+    $("#examples-open").setAttribute(
+      "aria-expanded",
+      String(state.galleryOpen),
+    );
     const selected = Boolean(state.photo || state.example);
+    $(".workbench").classList.toggle("has-photo", selected);
+    $("#prediction-panel").hidden = !selected;
     $("#empty").hidden = selected;
     $("#preview").hidden = !selected;
     $("#photo-label").hidden = !selected;
@@ -117,17 +118,12 @@ export default function (component) {
       ? "Checking your photo…"
       : "Predict Animal";
     $("#result").hidden = !state.result;
-    $("#ready").hidden = Boolean(state.result);
     $("#another").hidden = !selected || state.pending;
     parentElement
       .querySelectorAll(".gallery-card")
       .forEach((card, i) =>
         card.setAttribute("aria-pressed", String(i === state.active)),
       );
-    parentElement.querySelectorAll("#gallery-dots button").forEach((dot, i) => {
-      dot.classList.toggle("active", i === state.active);
-      dot.setAttribute("aria-current", i === state.active ? "true" : "false");
-    });
     $("#selected-credit").replaceChildren();
     if (state.example) {
       const item = gallery.find((item) => item.id === state.example);
@@ -229,6 +225,7 @@ export default function (component) {
       clearPrediction();
       state.example = null;
       state.active = -1;
+      state.galleryOpen = false;
       state.photo = {
         src: objectUrl,
         objectUrl,
@@ -288,6 +285,7 @@ export default function (component) {
   }
 
   listen($("#start"), "click", () => {
+    clearTimeout(root.transitionTimer);
     $("#welcome").classList.add("exit");
     const timer = setTimeout(
       () => {
@@ -296,21 +294,23 @@ export default function (component) {
         render();
         root.scrollIntoView({
           block: "start",
-          behavior: reduceMotion ? "auto" : "smooth",
+          behavior: reduceMotion.matches ? "auto" : "smooth",
         });
         focus($("#test-title"));
       },
-      reduceMotion ? 0 : 220,
+      reduceMotion.matches ? 0 : 120,
     );
     root.transitionTimer = timer;
   });
   listen($("#home"), "click", () => {
+    clearTimeout(root.transitionTimer);
+    $("#welcome").classList.remove("exit");
     state.stage = "welcome";
     closeCamera();
     render();
     root.scrollIntoView({
       block: "start",
-      behavior: reduceMotion ? "auto" : "smooth",
+      behavior: reduceMotion.matches ? "auto" : "smooth",
     });
     focus($("#start"));
   });
@@ -366,19 +366,31 @@ export default function (component) {
       0.92,
     );
   });
+  function scrollGalleryTo(card) {
+    const rail = $("#gallery");
+    const frame = rail.getBoundingClientRect();
+    const item = card.getBoundingClientRect();
+    if (item.left >= frame.left && item.right <= frame.right) return;
+    rail.scrollBy({
+      left: item.left - frame.left - 4,
+      behavior: reduceMotion.matches ? "instant" : "smooth",
+    });
+  }
+
   listen($("#examples-open"), "click", () => {
-    scrollTo($("#gallery-section"));
-    focus($("#gallery .gallery-card"));
+    state.galleryOpen = !state.galleryOpen;
+    render();
+    if (state.galleryOpen) {
+      scrollTo($("#gallery-section"));
+      focus($("#gallery").children[Math.max(0, state.active)]);
+    }
   });
-  parentElement
-    .querySelectorAll(".gallery-card,#gallery-dots button")
-    .forEach((button) =>
-      listen(button, "click", () => {
-        const i = Number(button.dataset.index);
-        selectExample(i);
-        scrollTo($("#gallery").children[i]);
-      }),
-    );
+  parentElement.querySelectorAll(".gallery-card").forEach((button) =>
+    listen(button, "click", () => {
+      selectExample(Number(button.dataset.index));
+      scrollGalleryTo(button);
+    }),
+  );
   listen($("#gallery"), "keydown", (event) => {
     if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
     const cards = Array.from($("#gallery").children);
@@ -393,7 +405,7 @@ export default function (component) {
       ),
     );
     focus(cards[next]);
-    scrollTo(cards[next]);
+    scrollGalleryTo(cards[next]);
   });
   for (const [id, direction] of [
     ["#gallery-prev", -1],
@@ -402,7 +414,7 @@ export default function (component) {
     listen($(id), "click", () =>
       $("#gallery").scrollBy({
         left: direction * $("#gallery").clientWidth * 0.75,
-        behavior: reduceMotion ? "auto" : "smooth",
+        behavior: reduceMotion.matches ? "instant" : "smooth",
       }),
     );
   listen($("#mode"), "change", (event) => {
@@ -419,7 +431,9 @@ export default function (component) {
     state.example = null;
     state.active = -1;
     clearPrediction();
+    $(".source-button.active")?.classList.remove("active");
     render();
+    scrollTo($(".source-tabs"));
     focus($("#upload"));
   });
   listen($("#photo-area"), "dragover", (event) => {

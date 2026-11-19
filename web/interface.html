@@ -13,33 +13,27 @@
       <span>Animal Classifier</span>
     </button>
     <button class="text-button" id="about-open">
-      A little about it <span class="info-symbol" aria-hidden="true">i</span>
+      About <span class="info-symbol" aria-hidden="true">i</span>
     </button>
   </header>
 
   <section id="welcome" class="welcome" aria-labelledby="welcome-title">
     <div class="hero-copy">
-      <p class="eyebrow">FIVE FAMILIAR ANIMALS</p>
       <h1 id="welcome-title">
         Animal<br />Classifier<span class="title-dot">.</span>
       </h1>
       <p class="hero-line">Discover what's in the picture.</p>
-      <p class="hero-support">
-        Choose a photo, take one,<br class="desktop-break" />
-        or explore our animal gallery.
-      </p>
+      <p class="hero-support">Upload a photo, take one, or try an example.</p>
       <button id="start" class="start-button">
         Get Started
         <span class="button-orbit" aria-hidden="true"><span></span></span>
       </button>
-      <p class="hero-caption">Cat. Dog. Cow. Horse. Sheep.</p>
     </div>
     <div class="hero-visual" aria-hidden="true">
       <div class="orbit orbit-one"></div>
       <div class="orbit orbit-two"></div>
       <figure class="portrait portrait-main">
         <img id="hero-main" alt="" />
-        <figcaption>A familiar face.</figcaption>
       </figure>
       <figure class="portrait portrait-small">
         <img id="hero-small" alt="" />
@@ -53,7 +47,6 @@
             stroke-linecap="round"
           /></svg
       ></span>
-      <span class="photo-note">Look a little closer.</span>
     </div>
   </section>
 
@@ -65,7 +58,6 @@
         </h1>
         <p>Choose a photo of a cat, dog, cow, horse or sheep.</p>
       </div>
-      <span class="quiet-label">CAT / DOG / COW / HORSE / SHEEP</span>
     </div>
     <div class="source-tabs" role="group" aria-label="Choose a photo source">
       <button id="upload" class="source-button">
@@ -79,7 +71,12 @@
           <circle cx="12" cy="12" r="4" /></svg
         >Take Photo
       </button>
-      <button id="examples-open" class="source-button">
+      <button
+        id="examples-open"
+        class="source-button"
+        aria-expanded="false"
+        aria-controls="gallery-section"
+      >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <rect x="3" y="3" width="18" height="18" rx="3" />
           <circle cx="8" cy="8" r="1.5" />
@@ -103,6 +100,33 @@
       aria-label="Take a photo with your phone camera"
     />
     <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
+    <section
+      id="gallery-section"
+      class="gallery-section"
+      aria-labelledby="gallery-title"
+      hidden
+    >
+      <div class="gallery-heading">
+        <div>
+          <h2 id="gallery-title">Example photos</h2>
+        </div>
+        <div class="gallery-nav">
+          <span>Swipe to explore</span
+          ><button id="gallery-prev" aria-label="Previous examples">‹</button
+          ><button id="gallery-next" aria-label="Next examples">›</button>
+        </div>
+      </div>
+      <div
+        id="gallery"
+        class="gallery"
+        role="group"
+        aria-label="Animal photo gallery"
+      ></div>
+      <div class="gallery-bottom">
+        <p id="selected-credit" class="selected-credit"></p>
+        <button id="credits-open" class="text-button">Photo credits</button>
+      </div>
+    </section>
     <div class="workbench">
       <div id="photo-area" class="photo-area" aria-label="Photo preview">
         <div id="empty" class="empty-photo">
@@ -115,33 +139,24 @@
             <circle cx="73" cy="67" r="2" />
             <path d="m93 13 2-9 2 9 9 2-9 2-2 9-2-9-9-2Z" class="accent-fill" />
           </svg>
-          <h2>Add an animal photo</h2>
-          <p>
-            Upload one, use your camera,<br />or pick a face from the gallery.
-          </p>
+          <h2>Choose a photo above</h2>
           <span class="format-hint">JPG, PNG or WEBP · up to 8 MB</span>
         </div>
         <img id="preview" alt="Your selected animal photo" hidden />
         <span id="photo-label" class="photo-label" hidden></span>
       </div>
-      <section class="prediction-panel" aria-label="Prediction">
-        <label class="model-label" for="mode">What shall we look for?</label>
+      <section
+        id="prediction-panel"
+        class="prediction-panel"
+        aria-label="Prediction"
+        hidden
+      >
+        <label class="model-label" for="mode">Animals to look for</label>
         <div class="select-wrap">
           <select id="mode">
             <option value="softmax">All five animals</option>
             <option value="binary">Cats and dogs only</option></select
           ><span aria-hidden="true">⌄</span>
-        </div>
-        <div id="ready" class="ready">
-          <p class="eyebrow">YOUR NEXT DISCOVERY</p>
-          <h2>
-            Ready when<br />
-            you are.
-          </h2>
-          <p>
-            A clear photo with the animal<br />
-            in view works best.
-          </p>
         </div>
         <div
           id="result"
@@ -150,7 +165,7 @@
           aria-live="polite"
           aria-atomic="true"
         >
-          <p class="eyebrow">LOOKS LIKE A</p>
+          <p class="eyebrow">Prediction</p>
           <h2 id="animal-name"></h2>
           <p class="probability">
             <span id="probability"></span><span>estimated probability</span>
@@ -173,48 +188,19 @@
         </button>
         <button id="another" class="another-button" hidden>Try Another</button>
         <p class="estimate-note">
-          A model's best guess, not a guarantee.<br />Unrelated photos still
-          receive an animal label.
+          The model can only choose from the animals listed.
         </p>
       </section>
     </div>
-    <section
-      id="gallery-section"
-      class="gallery-section"
-      aria-labelledby="gallery-title"
-    >
-      <div class="gallery-heading">
-        <div>
-          <p class="eyebrow">TEN FACES TO GET YOU STARTED</p>
-          <h2 id="gallery-title">Try an example</h2>
-        </div>
-        <div class="gallery-nav">
-          <span>Swipe to explore</span
-          ><button id="gallery-prev" aria-label="Previous examples">‹</button
-          ><button id="gallery-next" aria-label="Next examples">›</button>
-        </div>
-      </div>
-      <div
-        id="gallery"
-        class="gallery"
-        role="group"
-        aria-label="Animal photo gallery"
-      ></div>
-      <div class="gallery-bottom">
-        <div
-          id="gallery-dots"
-          class="gallery-dots"
-          aria-label="Gallery navigation"
-        ></div>
-        <button id="credits-open" class="text-button">Photo credits</button>
-      </div>
-      <p id="selected-credit" class="selected-credit"></p>
-    </section>
   </main>
   <footer class="app-footer">Developed by Himanshu Rajkhowa</footer>
-  <dialog id="camera-dialog" class="camera-dialog">
+  <dialog
+    id="camera-dialog"
+    class="camera-dialog"
+    aria-labelledby="camera-title"
+  >
     <div class="dialog-top">
-      <h2>Take a photo</h2>
+      <h2 id="camera-title">Take a photo</h2>
       <button id="camera-close" class="close-button" aria-label="Close camera">
         ×
       </button>
@@ -229,9 +215,9 @@
       </button>
     </div>
   </dialog>
-  <dialog id="about-dialog">
+  <dialog id="about-dialog" aria-labelledby="about-title">
     <div class="dialog-top">
-      <h2>A little about it</h2>
+      <h2 id="about-title">About</h2>
       <button
         class="close-button"
         data-close="about-dialog"
@@ -241,24 +227,19 @@
       </button>
     </div>
     <p>
-      Animal Classifier looks for five familiar animals using Logistic
-      Regression, with a frozen pretrained CNN turning the photo into useful
-      visual features.
+      A pretrained CNN extracts features from the photo. Logistic Regression
+      uses those features to choose an animal.
     </p>
     <p>
       The five-class model scored <strong>94.23%</strong> on its historical test
-      split and <strong>58.14%</strong> in a separate small external photo
-      evaluation. New phone photos may perform worse.
+      split and <strong>58.14%</strong> on 86 photos from a separate source.
     </p>
-    <p>
-      Photos are processed in memory on the app server. We don't save them. This
-      app doesn't detect unknown animals.
-    </p>
+    <p>The server processes your photo in memory. The app does not save it.</p>
     <button class="another-button" data-close="about-dialog">Got it</button>
   </dialog>
-  <dialog id="credits-dialog">
+  <dialog id="credits-dialog" aria-labelledby="credits-title">
     <div class="dialog-top">
-      <h2>The faces in our gallery</h2>
+      <h2 id="credits-title">Photo credits</h2>
       <button
         class="close-button"
         data-close="credits-dialog"
@@ -268,8 +249,8 @@
       </button>
     </div>
     <p>
-      Ten licensed photos, with thanks to their photographers. These aren't our
-      training or external-evaluation images.
+      The ten example photos come from iNaturalist. The original photos and
+      licenses are linked below.
     </p>
     <div id="credits-list" class="credits-list"></div>
     <p class="font-credit">
