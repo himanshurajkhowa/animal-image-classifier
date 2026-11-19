@@ -1,0 +1,74 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "check": "Saved array IDs, labels, exclusion and duplicate isolation",
+      "passed": true,
+      "retained": 12839
+    },
+    {
+      "check": "70/15/15 group split reproduced",
+      "passed": true,
+      "counts": {
+        "train": 8986,
+        "validation": 1928,
+        "test": 1925
+      }
+    },
+    {
+      "check": "All four notebooks fully executed with no error outputs or convergence warnings",
+      "passed": true
+    },
+    {
+      "check": "binary training-only scaler and selected-C group cross-validation reproduced",
+      "passed": true
+    },
+    {
+      "check": "binary saved predictions and test metrics verified",
+      "passed": true
+    },
+    {
+      "check": "softmax training-only scaler and selected-C group cross-validation reproduced",
+      "passed": true
+    },
+    {
+      "check": "softmax saved predictions and test metrics verified",
+      "passed": true
+    },
+    {
+      "check": "cnn saved predictions and test metrics verified",
+      "passed": true
+    },
+    {
+      "check": "Softmax and CNN have identical held-out image IDs and labels",
+      "passed": true,
+      "test_images": 1925
+    },
+    {
+      "check": "softmax raw-image demo parity",
+      "passed": true,
+      "images": 15,
+      "mean_milliseconds_including_decode": 1.0374221999882138,
+      "median_milliseconds_including_decode": 0.7850410001992714
+    },
+    {
+      "check": "cnn raw-image demo parity",
+      "passed": true,
+      "images": 15,
+      "mean_milliseconds_including_decode": 1.7251776665943908,
+      "median_milliseconds_including_decode": 0.7245420001709135
+    }
+  ],
+  "artifact_sha256": {
+    "split_manifest.csv": "d841e2da8463fa2d58b2a0019f4c083f896975a706cb04560687c0e95a173beb",
+    "preprocessing.json": "526641d9f41b47f99e32a61eed3725d65d4d75d1c6c19948392cc249d6c04d4d",
+    "binary.joblib": "4afc2662c7d437e3428bfe9932703ce36b01906ee8cf82915c419b968db088d6",
+    "softmax.joblib": "19278bbeefee296e0ec18ee2b61649efc33b733607ad1fda686dcc7718716b51",
+    "cnn.pt": "e071e0ec5a095ff8c2edfaf23cd7f641554aebc863300158d1f58b26ae2bacf6"
+  },
+  "notes": [
+    "MPS training may vary slightly across runs or devices.",
+    "Perceptual hashing cannot detect every related source image.",
+    "CPU inference latency is a local measurement, not a hosting benchmark."
+  ]
+}

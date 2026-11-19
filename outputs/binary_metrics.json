@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "model": "binary",
+    "accuracy": 0.7272727272727273,
+    "precision_macro": 0.5480924033097458,
+    "recall_macro": 0.5141332453100071,
+    "f1_macro": 0.48428649500746757,
+    "test_images": 979,
+    "file_bytes": 46152,
+    "training_seconds": 0.9574301660004494,
+    "selected_C": 0.01
+  },
+  "class_report": {
+    "Cat": {
+      "precision": 0.3448275862068966,
+      "recall": 0.08032128514056225,
+      "f1-score": 0.13029315960912052,
+      "support": 249.0
+    },
+    "Dog": {
+      "precision": 0.751357220412595,
+      "recall": 0.947945205479452,
+      "f1-score": 0.8382798304058147,
+      "support": 730.0
+    },
+    "accuracy": 0.7272727272727273,
+    "macro avg": {
+      "precision": 0.5480924033097458,
+      "recall": 0.5141332453100071,
+      "f1-score": 0.48428649500746757,
+      "support": 979.0
+    },
+    "weighted avg": {
+      "precision": 0.6479599998638524,
+      "recall": 0.7272727272727273,
+      "f1-score": 0.6582096761378097,
+      "support": 979.0
+    }
+  }
+}

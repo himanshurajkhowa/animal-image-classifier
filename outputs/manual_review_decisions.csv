@@ -1,0 +1,2 @@
+image_id,action,reason
+078ed46ead1d49bddaa3,exclude,Cow folder contains a horse photograph also present in Horse; visually confirmed before final model evaluation.

@@ -1,0 +1,15 @@
+{
+  "original_images": 26179,
+  "selected_files": 12840,
+  "corrupted": 0,
+  "exact_removed": 0,
+  "manual_excluded": 1,
+  "retained": 12839,
+  "near_pairs": 1108,
+  "groups": 12084,
+  "split_counts": {
+    "train": 8986,
+    "validation": 1928,
+    "test": 1925
+  }
+}

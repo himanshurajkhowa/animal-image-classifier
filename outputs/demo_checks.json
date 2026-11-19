@@ -1,0 +1,19 @@
+{
+  "homepage": 200,
+  "predictions": [
+    {
+      "model": "cnn",
+      "animal": "Dog",
+      "probability": 0.765981912612915,
+      "status": 200
+    },
+    {
+      "model": "softmax",
+      "animal": "Dog",
+      "probability": 0.663263738155365,
+      "status": 200
+    }
+  ],
+  "invalid_image": 400,
+  "browser_upload_test": "Both CNN and Softmax tested successfully through actual file chooser and Predict button."
+}

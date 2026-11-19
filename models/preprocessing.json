@@ -1,0 +1,31 @@
+{
+  "seed": 42,
+  "labels": [
+    "Cat",
+    "Dog",
+    "Cow",
+    "Horse",
+    "Sheep"
+  ],
+  "label_mapping": {
+    "0": "Cat",
+    "1": "Dog",
+    "2": "Cow",
+    "3": "Horse",
+    "4": "Sheep"
+  },
+  "logistic_size": [
+    24,
+    24
+  ],
+  "cnn_size": [
+    64,
+    64
+  ],
+  "color_mode": "RGB",
+  "orientation": "EXIF transpose",
+  "resize": "Pillow bilinear, direct square resize",
+  "normalization": "float32 / 255",
+  "near_duplicate_rule": "64-bit pHash distance <= 6 including horizontal reflection",
+  "split_method": "StratifiedGroupKFold 20 folds; train 0-13, validation 14-16, test 17-19"
+}

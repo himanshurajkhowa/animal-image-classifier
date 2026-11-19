@@ -1,0 +1,60 @@
+{
+  "summary": {
+    "model": "cnn",
+    "accuracy": 0.6327272727272727,
+    "precision_macro": 0.6107486716387783,
+    "recall_macro": 0.5749764326377125,
+    "f1_macro": 0.5856432980082458,
+    "test_images": 1925,
+    "file_bytes": 361413,
+    "training_seconds": 53.72965083300005,
+    "device": "mps",
+    "best_epoch": 19,
+    "parameters": 89509
+  },
+  "class_report": {
+    "Cat": {
+      "precision": 0.6045197740112994,
+      "recall": 0.42971887550200805,
+      "f1-score": 0.5023474178403756,
+      "support": 249.0
+    },
+    "Dog": {
+      "precision": 0.663953488372093,
+      "recall": 0.7821917808219178,
+      "f1-score": 0.7182389937106918,
+      "support": 730.0
+    },
+    "Cow": {
+      "precision": 0.5492227979274611,
+      "recall": 0.37857142857142856,
+      "f1-score": 0.44820295983086683,
+      "support": 280.0
+    },
+    "Horse": {
+      "precision": 0.6484560570071259,
+      "recall": 0.6946564885496184,
+      "f1-score": 0.6707616707616708,
+      "support": 393.0
+    },
+    "Sheep": {
+      "precision": 0.5875912408759124,
+      "recall": 0.5897435897435898,
+      "f1-score": 0.5886654478976234,
+      "support": 273.0
+    },
+    "accuracy": 0.6327272727272727,
+    "macro avg": {
+      "precision": 0.6107486716387783,
+      "recall": 0.5749764326377125,
+      "f1-score": 0.5856432980082458,
+      "support": 1925.0
+    },
+    "weighted avg": {
+      "precision": 0.6255841521158728,
+      "recall": 0.6327272727272727,
+      "f1-score": 0.622966651994332,
+      "support": 1925.0
+    }
+  }
+}
