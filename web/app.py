@@ -29,15 +29,13 @@ def visual_assets():
 
 
 @st.cache_resource(show_spinner=False)
-def interface():
+def interface(html, css, js):
     # These are trusted local files. Uploaded names and other user text are never interpolated into HTML.
-    css = (WEB / 'style.css').read_text()
     for family in ['Manrope', 'Caveat']:
         font = base64.b64encode((WEB / f'assets/fonts/{family}.ttf').read_bytes()).decode()
         css = css.replace(f'__{family.upper()}_FONT__', f'data:font/ttf;base64,{font}')
     return st.components.v2.component('animal_classifier_experience',
-        html=(WEB / 'interface.html').read_text(), css=css,
-        js=(WEB / 'interface.js').read_text(), isolate_styles=True)
+        html=html, css=css, js=js, isolate_styles=True)
 
 
 def answer_request():
@@ -73,6 +71,11 @@ def answer_request():
         request.clear()
 
 
-interface()(key='animal_experience', data={'gallery': visual_assets(),
+component = interface(
+    html=(WEB / 'interface.html').read_text(),
+    css=(WEB / 'style.css').read_text(),
+    js=(WEB / 'interface.js').read_text(),
+)
+component(key='animal_experience', data={'gallery': visual_assets(),
     'result': st.session_state.get('animal_result')}, on_predict_change=answer_request,
     width='stretch', height='content')
