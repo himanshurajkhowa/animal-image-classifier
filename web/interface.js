@@ -22,6 +22,115 @@ export default function (component) {
       signal: events.signal,
     });
   const gallery = data.gallery ?? [];
+  const maxPhotoBytes = 8 * 1024 * 1024;
+  const maxPreparedBytes = 700 * 1024;
+  const maxPhotoPixels = 24_000_000;
+  const heicHint =
+    "This browser could not open the HEIC photo. Export it as JPEG or upload a screenshot.";
+
+  function withPhotoDeadline(signal, work) {
+    return new Promise((resolve, reject) => {
+      signal.addEventListener("abort", () => reject(signal.reason), {
+        once: true,
+      });
+      if (signal.aborted) reject(signal.reason);
+      else Promise.resolve().then(work).then(resolve, reject);
+    });
+  }
+
+  async function photoFormat(file) {
+    const head = new Uint8Array(await file.slice(0, 32).arrayBuffer());
+    const tag = (offset, size) =>
+      String.fromCharCode(...head.slice(offset, offset + size));
+    if (head[0] === 255 && head[1] === 216 && head[2] === 255) return "jpeg";
+    if (head[0] === 137 && tag(1, 3) === "PNG") return "png";
+    if (tag(0, 4) === "RIFF" && tag(8, 4) === "WEBP") return "webp";
+    if (tag(4, 4) === "ftyp" && /^(heic|heix|heif|mif1)$/.test(tag(8, 4)))
+      return "heic";
+    if (/heic|heif/i.test(file.type) || /\.hei[cf]$/i.test(file.name)) {
+      throw new Error(heicHint);
+    }
+    throw new Error("Choose a valid JPG, PNG, WEBP or HEIC photo.");
+  }
+
+  async function preparePhoto(file, image, format, signal) {
+    if (file.size <= maxPreparedBytes && format !== "heic") return file;
+
+    // Do not turn an animated upload into an arbitrary still image.
+    if (format === "png" || format === "webp") {
+      const bytes = new DataView(await file.arrayBuffer());
+      if (signal.aborted) throw signal.reason;
+      if (
+        format === "webp" &&
+        bytes.byteLength > 20 &&
+        bytes.getUint32(12) === 0x56503858 &&
+        bytes.getUint8(20) & 2
+      ) {
+        throw new Error(
+          "Choose a still photograph rather than an animated image.",
+        );
+      }
+      if (format === "png") {
+        for (let offset = 8; offset + 12 <= bytes.byteLength; ) {
+          const type = bytes.getUint32(offset + 4);
+          if (type === 0x6163544c) {
+            throw new Error(
+              "Choose a still photograph rather than an animated image.",
+            );
+          }
+          if (type === 0x49444154) break;
+          offset += 12 + bytes.getUint32(offset);
+        }
+      }
+    }
+
+    // Keep the whole frame. The model's resize and centre crop still run on the server.
+    const scale = Math.min(
+      1,
+      1800 / Math.max(image.naturalWidth, image.naturalHeight),
+    );
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    try {
+      const ctx = canvas.getContext("2d", { alpha: false });
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      for (const quality of [0.88, 0.72, 0.55]) {
+        const blob = await new Promise((resolve) =>
+          canvas.toBlob(resolve, "image/jpeg", quality),
+        );
+        if (signal.aborted) throw signal.reason;
+        if (
+          blob?.type === "image/jpeg" &&
+          blob.size &&
+          blob.size <= maxPreparedBytes
+        )
+          return blob;
+      }
+      throw new Error(
+        "This photo could not be made small enough. Try a smaller copy.",
+      );
+    } finally {
+      canvas.width = canvas.height = 0;
+    }
+  }
+
+  function readUpload(blob, signal) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      const abort = () => reader.abort();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reader.onabort = () =>
+        reject(
+          new Error(
+            "Could not read the photo. Try again or choose another one.",
+          ),
+        );
+      reader.onloadend = () => signal.removeEventListener("abort", abort);
+      signal.addEventListener("abort", abort, { once: true });
+      reader.readAsDataURL(blob);
+    });
+  }
   const showNotice = (message = "") => {
     $("#notice").textContent = message;
     $("#notice").hidden = !message;
@@ -110,7 +219,8 @@ export default function (component) {
     } else {
       $("#preview").removeAttribute("src");
     }
-    $("#predict").disabled = !selected || state.pending;
+    $("#predict").disabled =
+      !selected || state.pending || Boolean(root.photoJob);
     $("#predict").setAttribute("aria-busy", String(state.pending));
     $(".loading-ring").hidden = !state.pending;
     $("#predict svg").hidden = state.pending;
@@ -175,6 +285,7 @@ export default function (component) {
     state.photo = null;
   }
   function selectExample(index) {
+    cancelPhotoJob();
     releasePhoto();
     clearPrediction();
     state.active = index;
@@ -190,56 +301,122 @@ export default function (component) {
         "Cat and Dog mode only supports those two animals. Choose All five animals for this example.",
       );
   }
+  function cancelPhotoJob() {
+    root.photoJob?.abort();
+    root.photoJob = null;
+    showUploadStatus();
+  }
+
+  function showUploadStatus(message = "", busy = false) {
+    const status = $("#upload-status");
+    status.textContent = message;
+    status.hidden = !message;
+    $("#upload").setAttribute("aria-busy", String(busy));
+    $("#upload-label").textContent = busy ? "Preparing…" : "Upload Photo";
+    if (message) status.scrollIntoView({ block: "nearest" });
+  }
+
   async function selectFile(file, fromCamera = false) {
     if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      showNotice("Choose a photo smaller than 8 MB.");
-      return;
-    }
-    const allowed = ["image/jpeg", "image/png", "image/webp"];
-    if (
-      !allowed.includes(file.type) &&
-      !/\.(jpe?g|png|webp)$/i.test(file.name)
-    ) {
-      showNotice(
-        "Choose a JPG, PNG or WEBP photo. If your photo is HEIC, export it as JPEG first.",
+    cancelPhotoJob();
+    clearPrediction();
+    releasePhoto();
+    state.example = null;
+    state.active = -1;
+    state.galleryOpen = false;
+    $(".source-button.active")?.classList.remove("active");
+    const job = new AbortController();
+    const { signal } = job;
+    root.photoJob = job;
+    showUploadStatus("Preparing your photo…", true);
+    render();
+
+    let sourceUrl;
+    let image;
+    let detachImage;
+    const timeout = setTimeout(() => {
+      job.abort(
+        new Error(
+          "This photo took too long to open. Try a smaller copy or a screenshot.",
+        ),
       );
-      return;
-    }
-    let objectUrl;
+    }, 25000);
     try {
-      const encoded = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+      const prepared = await withPhotoDeadline(signal, async () => {
+        if (!file.size)
+          throw new Error("That photo is empty. Choose another one.");
+        if (file.size > maxPhotoBytes)
+          throw new Error("Choose a photo no larger than 8 MB.");
+        const format = await photoFormat(file);
+        if (signal.aborted) throw signal.reason;
+        sourceUrl = URL.createObjectURL(file);
+        image = new Image();
+        await new Promise((resolve, reject) => {
+          detachImage = () => {
+            image.removeAttribute("src");
+            reject(signal.reason);
+          };
+          signal.addEventListener("abort", detachImage, { once: true });
+          image.onload = resolve;
+          image.onerror = () =>
+            reject(
+              new Error(
+                format === "heic"
+                  ? heicHint
+                  : "We could not open that photo. Try another JPG, PNG or WEBP image.",
+              ),
+            );
+          image.src = sourceUrl;
+        });
+        const { naturalWidth: width, naturalHeight: height } = image;
+        if (!width || !height)
+          throw new Error("We could not open that photo. Choose another one.");
+        if (width * height > maxPhotoPixels) {
+          throw new Error(
+            "This photo is over 24 megapixels. Try a smaller copy or a screenshot.",
+          );
+        }
+        if (Math.max(width, height) > 32 * Math.min(width, height)) {
+          throw new Error(
+            "This photo is too narrow. Crop it around the animal and try again.",
+          );
+        }
+        const blob = await preparePhoto(file, image, format, signal);
+        if (signal.aborted) throw signal.reason;
+        return { blob, encoded: await readUpload(blob, signal) };
       });
-      objectUrl = URL.createObjectURL(file);
-      await new Promise((resolve, reject) => {
-        const image = new Image();
-        image.onload = resolve;
-        image.onerror = reject;
-        image.src = objectUrl;
-      });
-      releasePhoto();
-      clearPrediction();
-      state.example = null;
-      state.active = -1;
-      state.galleryOpen = false;
+      if (root.photoJob !== job) return;
+      const previewUrl = URL.createObjectURL(prepared.blob);
       state.photo = {
-        src: objectUrl,
-        objectUrl,
-        encoded: encoded.split(",")[1],
+        src: previewUrl,
+        objectUrl: previewUrl,
+        encoded: prepared.encoded,
         name: fromCamera ? "Camera photo" : file.name.slice(0, 100),
       };
-      $(".source-button.active")?.classList.remove("active");
       $(fromCamera ? "#camera-open" : "#upload").classList.add("active");
-      render();
-    } catch {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-      showNotice(
-        "We could not open that photo. Please choose a valid JPG, PNG or WEBP image.",
-      );
+      showUploadStatus("Photo ready. Tap Predict Animal.");
+    } catch (error) {
+      if (root.photoJob === job) {
+        showUploadStatus(
+          error.name === "Error"
+            ? error.message
+            : "We could not prepare that photo. Try a smaller copy or choose another one.",
+        );
+      }
+    } finally {
+      clearTimeout(timeout);
+      if (detachImage) signal.removeEventListener("abort", detachImage);
+      if (image) image.removeAttribute("src");
+      if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+      for (const input of [$("#file"), $("#camera-file")]) {
+        if (input.files[0] === file) input.value = "";
+      }
+      if (root.photoJob === job) {
+        root.photoJob = null;
+        $("#upload").setAttribute("aria-busy", "false");
+        $("#upload-label").textContent = "Upload Photo";
+        render();
+      }
     }
   }
   function closeCamera() {
@@ -321,14 +498,15 @@ export default function (component) {
     .forEach((button) =>
       listen(button, "click", () => $("#" + button.dataset.close).close()),
     );
-  listen($("#upload"), "click", () => $("#file").click());
+  listen($("#upload"), "click", () => {
+    $("#file").value = "";
+    $("#file").click();
+  });
   listen($("#file"), "change", (event) => {
     selectFile(event.target.files[0]);
-    event.target.value = "";
   });
   listen($("#camera-file"), "change", (event) => {
     selectFile(event.target.files[0], true);
-    event.target.value = "";
   });
   listen($("#camera-open"), "click", openCamera);
   listen($("#camera-close"), "click", closeCamera);
@@ -339,6 +517,7 @@ export default function (component) {
   });
   listen($("#camera-fallback"), "click", () => {
     closeCamera();
+    $("#camera-file").value = "";
     $("#camera-file").click();
   });
   listen($("#capture"), "click", () => {
@@ -427,6 +606,7 @@ export default function (component) {
       );
   });
   listen($("#another"), "click", () => {
+    cancelPhotoJob();
     releasePhoto();
     state.example = null;
     state.active = -1;
@@ -449,7 +629,8 @@ export default function (component) {
     selectFile(event.dataTransfer.files[0]);
   });
   listen($("#predict"), "click", () => {
-    if (state.pending || (!state.photo && !state.example)) return;
+    if (state.pending || root.photoJob || (!state.photo && !state.example))
+      return;
     if (
       state.example &&
       state.mode === "binary" &&
@@ -462,6 +643,7 @@ export default function (component) {
       );
       return;
     }
+    showUploadStatus();
     state.pending = true;
     state.result = null;
     state.requestId = crypto.randomUUID();
@@ -497,6 +679,7 @@ export default function (component) {
     clearTimeout(root.transitionTimer);
     queueMicrotask(() => {
       if (!root.isConnected) {
+        cancelPhotoJob();
         clearTimeout(root.pendingTimer);
         state.stream?.getTracks().forEach((track) => track.stop());
         releasePhoto();

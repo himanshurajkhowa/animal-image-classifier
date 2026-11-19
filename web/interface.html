@@ -63,7 +63,7 @@
       <button id="upload" class="source-button">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5" /></svg
-        >Upload Photo
+        ><span id="upload-label">Upload Photo</span>
       </button>
       <button id="camera-open" class="source-button">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -87,7 +87,7 @@
     <input
       id="file"
       type="file"
-      accept="image/jpeg,image/png,image/webp"
+      accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
       hidden
       aria-label="Choose an animal photo"
     />
@@ -99,6 +99,13 @@
       hidden
       aria-label="Take a photo with your phone camera"
     />
+    <p
+      id="upload-status"
+      class="notice"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></p>
     <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
     <section
       id="gallery-section"
